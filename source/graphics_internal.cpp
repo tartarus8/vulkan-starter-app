@@ -743,6 +743,27 @@ retry_acquire:
 	}
 
 	vkResetFences(context.device, 1, &vk_fence_frame_in_flight);
+	vkResetCommandBuffer(vk_command_buffer, 0);
+
+	const VkCommandBufferBeginInfo command_buffer_begin = {
+		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+		.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
+	};
+	vkBeginCommandBuffer(vk_command_buffer, &command_buffer_begin);
+
+	const VkClearValue clear_values[] = {
+		{ .color = { .float32 = { 0.08f, 0.09f, 0.12f, 1.0f } } },
+		{ .depthStencil = { 1.0f, 0 } },
+	};
+	const VkRenderPassBeginInfo render_pass_begin = {
+		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+		.renderPass = context.render_pass,
+		.framebuffer = vk_framebuffers[vk_swapchain_current_image],
+		.renderArea = { .extent = context.swapchain_extent },
+		.clearValueCount = sizeof(clear_values) / sizeof(clear_values[0]),
+		.pClearValues = clear_values,
+	};
+	vkCmdBeginRenderPass(vk_command_buffer, &render_pass_begin, VK_SUBPASS_CONTENTS_INLINE);
 
 	return {
 		.framebuffer = vk_framebuffers[vk_swapchain_current_image],
@@ -751,6 +772,8 @@ retry_acquire:
 }
 
 void submitAndPresent() {
+	vkCmdEndRenderPass(vk_command_buffer);
+	vkEndCommandBuffer(vk_command_buffer);
 	drawImGUI();
 
 	const VkPipelineStageFlags stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
@@ -786,7 +809,7 @@ void submitAndPresent() {
 	    result == VK_SUBOPTIMAL_KHR ||
 	    vk_swapchain_resize_require) {
 		rebuildSwapchain(vk_swapchain_resize_width, vk_swapchain_resize_height);
-	} else {
+	} else if (result != VK_SUCCESS) {
 		std::cerr << "Failed to present Vulkan swapchain image\n";
 	}
 }

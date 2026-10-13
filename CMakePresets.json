@@ -24,6 +24,18 @@
 			}
 		},
 		{
+			"name": "macos-debug",
+			"inherits": "debug",
+			"generator": "Unix Makefiles",
+			"binaryDir": "build-macos-debug"
+		},
+		{
+			"name": "macos-release",
+			"inherits": "release",
+			"generator": "Unix Makefiles",
+			"binaryDir": "build-macos-release"
+		},
+		{
 			"name": "msvc-debug",
 			"inherits": "debug",
 			"generator": "Visual Studio 17 2022"

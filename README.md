@@ -9,9 +9,9 @@ This project uses C++20 standard and thus requires either of those compilers:
 - Clang 10
 - Microsoft Visual Studio 2019
 
-This is officially tested on *Windows* and *GNU/Linux platforms*, no *macOS* support yet.
-If you have a working macOS solution of this code, consider submitting a PR so others
-can build this example code without a hassle!
+The macOS debug preset has been tested on an Apple M1 with macOS 15.6.1 and Vulkan SDK 1.4.363.0.
+On macOS, source `setup-env.sh` from your installed Vulkan SDK before configuring
+(for example, `source ~/VulkanSDK/1.4.363.0/setup-env.sh`).
 
 <ins>**1. Downloading the repository**</ins>
 
@@ -27,6 +27,7 @@ Run either one of the CMake lines to download dependencies and configure the pro
 cmake --preset debug       # for GNU/Linux (GCC/Clang)
 cmake --preset msvc-debug  # for Windows (Visual Studio 2019)
 cmake --preset mingw-debug # for Windows (MinGW)
+cmake --preset macos-debug # for macOS (Clang, Makefiles)
 ```
 
 If you wish to build in `release` mode, change `debug` to `release`.
@@ -45,6 +46,8 @@ Run one those commands, depending on which preset you chose:
 ```bash
 cmake --build build-debug --parallel # for debug
 cmake --build build-release --parallel # for release
+cmake --build build-macos-debug --parallel # for macOS debug
+cmake --build build-macos-release --parallel # for macOS release
 ```
 
 ### Running
