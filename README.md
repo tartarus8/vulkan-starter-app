@@ -1,69 +1,38 @@
-# 🌋 Vulkan Starter App
+# Vulkan Starter App
 
-## Getting started
+A C++20 Vulkan application that opens a GLFW window and renders the Dear ImGui demo. CMake downloads GLFW, vk-bootstrap, Vulkan Memory Allocator, and ImGui on the first configure, so that step needs an Internet connection.
 
-You need C++ compiler, Vulkan SDK and CMake installed before you can build this project.
+## macOS
 
-This project uses C++20 standard and thus requires either of those compilers:
-- GCC 10.X
-- Clang 10
-- Microsoft Visual Studio 2019
+**The app now runs on macOS.** It was verified on an Apple M1 with macOS 15.6.1, Vulkan SDK 1.4.363.0, and MoltenVK. Other Mac configurations have not been tested here.
 
-The macOS debug preset has been tested on an Apple M1 with macOS 15.6.1 and Vulkan SDK 1.4.363.0.
-On macOS, source `setup-env.sh` from your installed Vulkan SDK before configuring
-(for example, `source ~/VulkanSDK/1.4.363.0/setup-env.sh`).
+Install CMake, the Apple command-line developer tools, and the Vulkan SDK. From the repository root, source the SDK environment and build:
 
-<ins>**1. Downloading the repository**</ins>
-
-Start by cloning the repository with `git clone --depth 1 https://github.com/vladeemerr/vulkan-starter-app`
-
-This repository does not contain any submodules, it utilizes CMake's `FetchContent` feature instead.
-
-<ins>**2. Configuring the project**</ins>
-
-Run either one of the CMake lines to download dependencies and configure the project:
-
-```bash
-cmake --preset debug       # for GNU/Linux (GCC/Clang)
-cmake --preset msvc-debug  # for Windows (Visual Studio 2019)
-cmake --preset mingw-debug # for Windows (MinGW)
-cmake --preset macos-debug # for macOS (Clang, Makefiles)
+```zsh
+source "$HOME/VulkanSDK/1.4.363.0/setup-env.sh" # adjust to your SDK version/path
+cmake --preset macos-debug
+cmake --build build-macos-debug --parallel
+./build-macos-debug/vulkan-starter-app
 ```
 
-If you wish to build in `release` mode, change `debug` to `release`.
+`macos-debug` uses Unix Makefiles; Ninja is not needed. For a release build, use `macos-release` and `build-macos-release` in the commands above.
 
-If changes are made (added/removed files), or if you want to regenerate project files, rerun the command above.
+In VS Code, open this folder and run the same commands in its integrated terminal. If you use CMake Tools, select the `macos-debug` configure preset and ensure VS Code has the SDK environment.
 
-<ins>**3. Building**</ins>
+## Linux and Windows
 
-To build the project, use the line below. You are most likely using `debug` preset, so
-the directory that will eventually contain your build files is named `build-debug`.
+A C++20 compiler, CMake, the Vulkan SDK, and the selected CMake generator are required. `debug` and `release` use Ninja; `msvc-debug` and `msvc-release` use Visual Studio 2022; `mingw-debug` and `mingw-release` use MinGW Makefiles.
 
-Likewise for `release` that directory will be named `build-release`
+Configure with the preset for your toolchain, then build its `build-debug` or `build-release` directory. For example, on Linux:
 
-Run one those commands, depending on which preset you chose:
-
-```bash
-cmake --build build-debug --parallel # for debug
-cmake --build build-release --parallel # for release
-cmake --build build-macos-debug --parallel # for macOS debug
-cmake --build build-macos-release --parallel # for macOS release
+```sh
+cmake --preset debug
+cmake --build build-debug --parallel
+./build-debug/vulkan-starter-app
 ```
 
-### Running
+Use a fresh build directory when switching generators. Run the executable from the repository root so relative resource paths resolve correctly.
 
-`build-*` directory will contain the executable in one of the subdirectories after successful build.
+## Shaders
 
-For `msvc-{debug|release}` builds output subdirectory is set to `Debug` or `Release` respectively.
-For other configurations output subdirectory is set to `vulkan-starter-app`.
-
-**Make sure your working directory is set to the project root!**
-Project root is where this README file resides. Otherwise, the
-code responsible for loading shaders or other resources from files will fail,
-because relative paths are used.
-
-### Compiling shaders
-
-`CMakeLists.txt` has a build recipe for compiling shader files
-along with an application. Look for a comment in this file to see
-how to compile your shaders.
+The current demo does not need external shaders. To add GLSL shaders, add `compile_shader(...)` calls in `CMakeLists.txt` for files under `shaders/`. When `glslc` is available, CMake compiles those files to `.spv` during the build.
